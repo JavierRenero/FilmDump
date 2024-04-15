@@ -8,11 +8,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-/* func handleIndex(w http.ResponseWriter, r *http.Request) {
-
-	json.NewEncoder(w).Encode("{\"message\": \"Hello World\"}")
-} */
-
 func main() {
 
 	r := mux.NewRouter()

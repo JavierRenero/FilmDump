@@ -14,7 +14,7 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 
 	r.HandleFunc(a.allPages[0], a.callService).Methods(http.MethodGet)
 	r.HandleFunc(a.allPages[1], a.handleIndex).Methods(http.MethodGet)
-	r.HandleFunc(a.allPages[5], a.getDiscover).Methods(http.MethodGet)
+	r.HandleFunc(a.allPages[2], a.getDiscover).Methods(http.MethodGet)
 
 	/* a.allPages = append(a.allPages, "/get")
 	a.allPages = append(a.allPages, "/")
