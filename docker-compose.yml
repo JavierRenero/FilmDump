@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./MS_API_V0.1
+      dockerfile: Dockerfile
+    command: go run main.go
+    networks:
+      - my_network
+    ports:
+      - "8080:8080"
+
+  # robot:
+  #   image: javier8renero/tfg_ms:humble
+  #   depends_on:
+  #     - api
+  #   # Por si en vez de hacer un pull, quiere compilar la imagen en local, decomentar todos lo build
+  #   # build:
+  #   #   context: ./Docker
+  #   #   dockerfile: Dockerfile
+  #   # WINDOWS INICIO
+  #   # !! En caso de ejecutarlo en windows descomentar las siguientes lineas
+  #   # environment:
+  #   #   - DISPLAY=host.docker.internal:0.0
+  #   #   - LIBGL_ALWAYS_INDIRECT=0
+  #   #   - TURTLEBOT3_MODEL=waffle_pi
+  #   # WINDOWS FIN
+  #   # LINUX Y MACOS INICIO
+  #   # Recuerde mirar el archivo README.md y la memoria del TFG, para configurar correctamente el docker y generar todos los archivos corectamente
+  #   environment:
+  #     - DISPLAY=$DISPLAY
+  #     - TERM=$TERM
+  #     - QT_X11_NO_MITSHM=1
+  #     - XAUTHORITY=/tmp/.docker.xauth
+  #     - TURTLEBOT3_MODEL=waffle_pi
+  #   volumes:
+  #     - /tmp/.docker.xauth:/tmp/.docker.xauth
+  #     - /tmp/.X11-unix:/tmp/.X11-unix
+  #   devices:
+  #     - /dev/dri:/dev/dri
+  #   # LINUX Y MACOS FIN
+  #   command: ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py 
+  #   networks:
+  #     - my_network
+   
+  # ms_autocontrol:
+  #   image: javier8renero/tfg_ms:humble
+  #   depends_on:
+  #     - robot
+  #   # build:
+  #   #   context: ./Docker
+  #   #   dockerfile: Dockerfile
+  #   command: ros2 run turtlebot3_gazebo turtlebot3_drive
+  #   networks:
+  #     - my_network
+    
+  # ms_battery_publisher:
+  #   image: javier8renero/tfg_ms:humble
+  #   depends_on:
+  #     - robot
+  #     - ms_autocontrol
+  #   # build:
+  #   #   context: ./Docker
+  #   #   dockerfile: Dockerfile
+  #   command: ros2 run ms_sub battery_publisher
+  #   networks:
+  #     - my_network
+    
+  # ms_odm:
+  #   image: javier8renero/tfg_ms:humble
+  #   depends_on:
+  #     - robot
+  #     - ms_autocontrol
+  #   # build:
+  #   #   context: ./Docker
+  #   #   dockerfile: Dockerfile
+  #   command: ros2 run ms_sub odom_suscriber
+  #   networks:
+  #     - my_network
+  #   ports:
+  #     - 5001:5001
+    
+  # ms_battery_subscriber:
+  #   image: javier8renero/tfg_ms:humble
+  #   depends_on:
+  #     - robot
+  #     - ms_autocontrol
+  #   # build:
+  #   #   context: ./Docker
+  #   #   dockerfile: Dockerfile
+  #   command: ros2 run ms_sub battery_subscriber
+  #   networks:
+  #     - my_network
+  #   ports:
+  #     - 5000:5000
+
+networks:
+  my_network:
+    driver: bridge
+    
+
