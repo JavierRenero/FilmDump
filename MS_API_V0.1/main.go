@@ -4,8 +4,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/JavierRenero/FilmDump/MS_API_V0.1/api"
 	"github.com/gorilla/mux"
 )
+
+/* func handleIndex(w http.ResponseWriter, r *http.Request) {
+
+	json.NewEncoder(w).Encode("{\"message\": \"Hello World\"}")
+} */
 
 func main() {
 
