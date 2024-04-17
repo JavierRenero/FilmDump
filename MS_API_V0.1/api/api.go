@@ -1,11 +1,9 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
 )
 
 type API struct {
@@ -20,10 +18,7 @@ type Movie struct {
 	Rating   int    `json:"rating"`
 }
 
-type serviceCall struct {
-	ServiceName string `json:"serviceName"`
-	Movie       Movie  `json:"movie"`
-}
+var url = "http://127.0.0.1:8081/"
 
 func (a *API) handleIndex(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("Message ERROR: You need to specify a valid endpoint")
@@ -49,108 +44,57 @@ func (a *API) getDiscover(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (a *API) callService(w http.ResponseWriter, r *http.Request) {
-	params := &serviceCall{}
-
-	err := json.NewDecoder(r.Body).Decode(params)
+func (a *API) addMovie(w http.ResponseWriter, r *http.Request) {
+	// Create a new slice of Movies to store the JSON request body
+	var newMovies *[]Movie
+	// Decode the JSON request body into the newMovies slice
+	err := json.NewDecoder(r.Body).Decode(&newMovies)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	print(params.ServiceName)
-	print(params.Movie.Director)
-
-	url := fmt.Sprintf("http://127.0.0.1:5000/%s", params.ServiceName)
-	req, err := http.NewRequest("POST", url, nil)
+	// Verify that all movies have the Movie structure
+	for _, movie := range *newMovies {
+		if movie.Title == "" || movie.Director == "" || movie.Genre == "" || movie.Year == 0 || movie.Rating == 0 {
+			http.Error(w, "Invalid movie data", http.StatusBadRequest)
+			return
+		}
+	}
+	// Create a new HTTP request to send to the micro-service
+	reqBody, err := json.Marshal(newMovies)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	println(url)
+	// Create a new HTTP request to send to the micro-service
+	req, err := http.NewRequest(http.MethodPost, url+"addMovie", bytes.NewBuffer(reqBody))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	jsonValue, _ := json.Marshal(params.Movie)
-	req.Body = ioutil.NopCloser(strings.NewReader(string(jsonValue)))
+	// Set the request content type to JSON
+	req.Header.Set("Content-Type", "application/json")
 
+	// Send the request
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(body)
-}
-
-/* func (a *API) addMovie(w http.ResponseWriter, r *http.Request) {
-	params := &Movie{}
-
-	err := json.NewDecoder(r.Body).Decode(params)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// Set up the HTTP request to send to the ROS 2 micro-service
-	url := "http://127.0.0.1:5000/battery"
-	// Create the complete URL with the query parameter
-	urlWithParams := fmt.Sprintf("%s?idRob=%s", url, params.IdRob)
-
-	req, err := http.Get(urlWithParams)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer req.Body.Close()
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	// Define a struct to extract the battery level from the JSON response
-	type BatteryResponse struct {
-		Level string `json:"battery_level"`
-	}
-
-	// Unmarshal the JSON response into the struct
-	var batteryResp BatteryResponse
-	err = json.Unmarshal(body, &batteryResp)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if strings.Compare(batteryResp.Level, "No data") == 0 {
-		http.Error(w, "No data, So publiser Not Available", http.StatusNotFound)
-		return
-	}
-
-	response := struct {
-		ID           string `json:"id"`
-		BatteryLevel string `json:"battery_level"`
-	}{
-		ID:           params.IdRob,
-		BatteryLevel: batteryResp.Level,
-	}
-
-	// Set the response content type to JSON
-	w.Header().Set("Content-Type", "application/json")
-	// Encode the response struct as JSON and write it to the response writer
-	err = json.NewEncoder(w).Encode(response)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	// Check if the response is satisfactory
+	if resp.StatusCode == http.StatusOK {
+		w.Write([]byte("Movie(s) added successfully"))
+	} else {
+		// Send an error message indicating that the movie(s) could not be added
+		w.Write([]byte("Failed to add movie(s)"))
 	}
 }
 
-func (a *API) upMovie(w http.ResponseWriter, r *http.Request) {
+/* func (a *API) upMovie(w http.ResponseWriter, r *http.Request) {
 	params := &robotId{}
 
 	err := json.NewDecoder(r.Body).Decode(params)
