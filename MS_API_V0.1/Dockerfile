@@ -1,12 +1,15 @@
-FROM golang:1.22-alpine as dev
+FROM python:3.9-slim
 
 WORKDIR /app
-# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
-COPY go.mod go.sum main.go ./
-RUN go mod download && go mod verify
 
-# copy the rest of the source code and build
-COPY api ./api
+# Copy the requirements file to the working directory
+COPY requirements.txt .
 
-# build the binary
-RUN go mod tidy
+# Install the Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code to the working directory
+COPY . .
+
+# Set the command to run the application
+CMD [ "python", "index.py" ]

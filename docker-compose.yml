@@ -1,33 +1,25 @@
 version: '3.8'
 
 services:
-  # api:
-  #   build:
-  #     context: ./MS_API_V0.1
-  #     dockerfile: Dockerfile
-  #   command: go run main.go
-  #   ports:
-  #     - "8080:8080"
-  addmovie:
+  mongo:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+
+  api:
     build:
-      context: ./MS_AddMovie_V0.1
+      context: ./MS_API_V0.1
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"
-  # mongo:
-  #   image: mongo:7.0
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: admin
-  #     MONGO_INITDB_ROOT_PASSWORD: filmdump
-  #   ports:
-  #     - "5050:5050"
-  #   volumes:
-  #     - mongo_data:/data/db
+      - 8081:8081
+    depends_on:
+      - mongo
  
 volumes:
   mongo_data:
     driver: local
-
 
     
 
