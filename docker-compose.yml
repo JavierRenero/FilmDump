@@ -19,10 +19,26 @@ services:
       - 8081:8081
     depends_on:
       - mongo
+
+  # web:
+  #   build:
+  #     context: ./MS_FE_V0.1
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./MS_FE_V0.1:/app
+  #     - node_modules:/app/node_modules
+  #   ports:
+  #     - 3000:3000
+  #   environment:
+  #     - NODE_ENV=development
+  #   depends_on:
+  #     - api
+    
  
 volumes:
   mongo_data:
     driver: local
+  # node_modules: 
 
     
 
