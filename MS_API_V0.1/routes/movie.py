@@ -6,7 +6,7 @@ from starlette.status import HTTP_204_NO_CONTENT
 
 from models.movie import Movie
 from config.db import conn
-from schemas.movie import movieEntity, moviesEntity,serializeList
+from schemas.movie import movieEntity, moviesEntity
 from typing import List
 
 movie = APIRouter()

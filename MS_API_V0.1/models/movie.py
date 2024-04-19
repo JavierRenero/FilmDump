@@ -8,6 +8,6 @@ class Movie(BaseModel):
     director: str
     year: int
     genre: str
-    rating: int
+    rating: float
 
 
