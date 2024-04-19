@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 class Movie(BaseModel):
-    id: Optional[str]
+   # id: Optional[str]
     title: str
     director: str
     year: int

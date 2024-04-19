@@ -1,11 +1,13 @@
 from bson import ObjectId
 from fastapi import APIRouter, status,Response
 from bson import ObjectId
+from typing import Optional
 from starlette.status import HTTP_204_NO_CONTENT
 
 from models.movie import Movie
 from config.db import conn
-from schemas.movie import movieEntity, moviesEntity
+from schemas.movie import movieEntity, moviesEntity,serializeList
+from typing import List
 
 movie = APIRouter()
 
@@ -18,9 +20,9 @@ async def find_all_movies():
 @movie.post('/movies', response_model=Movie, tags=["Movies"])
 async def create_movie(movie: Movie):
     new_movie = dict(movie)
-    del new_movie["id"]
-    id = conn.insert_one(new_movie).inserted_id
-    movie = conn.find_one({"_id": id})
+    #del new_movie["id"]
+    conn.insert_one(new_movie)
+    movie = conn.find_one({"title": movie.title})
     return movieEntity(movie)
 
 
@@ -36,12 +38,31 @@ async def update_movie(title: str, movie: Movie):
     }, {
         "$set": dict(movie)
     })
-    return movieEntity(conn.find_one({"_id": ObjectId(movie["id"])}))
+    return movieEntity(conn.find_one({"title": title}))
 
+""" @movie.get('/movies/filter', response_model=list[Movie], tags=["Movies"])
+async def filter_movies(title: str = None, director: str = None, year: int = None, rating: int = None, genre: str = None):
+    print(title, director, year, rating, genre)
+    print("AQUISSSS")   
+    query = {}
+    if title is not None:
+        query["title"] = title
+    if director is not None:
+        query["director"] = director
+    if year is not None:
+        query["year"] = year
+    if rating is not None:
+        query["rating"] = rating
+    if genre is not None:
+        query["genre"] = genre
 
-@movie.delete("/movies/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Movies"])
-async def delete_movie(id: str):
+    return print("AQUISSSS"+name, director, year, rating, genre)
+   # return moviesEntity(conn.find({"title": name, "director": director, "year": year, "rating": rating, "genre": genre}))
+ """
+
+@movie.delete("/movies/{title}", status_code=status.HTTP_204_NO_CONTENT, tags=["Movies"])
+async def delete_movie(title: str):
     conn.find_one_and_delete({
-        "_id": ObjectId(id)
+        "title": title
     })
     return Response(status_code = HTTP_204_NO_CONTENT)
