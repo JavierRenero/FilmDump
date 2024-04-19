@@ -40,20 +40,30 @@ async def update_movie(title: str, movie: Movie):
     })
     return movieEntity(conn.find_one({"title": title}))
 
-@movie.get('/movies/filter/', response_model=list[Movie], tags=["Movies"])
-async def filter_movies(title: str = None, director: str = None, year: int = None, rating: int = None, genre: str = None):  
+@movie.get('/filter', response_model=list[Movie], tags=["Movies"])
+async def filter_movies(title: Optional[str] = None, director: Optional[str] = None, year: Optional[int] = None, rating: Optional[int] = None, genre: Optional[str] = None):  
     query = {}
     if title is not None:
-        query["title"] = title
+        query["title"] = {"$regex": title, "$options": "i"}
     if director is not None:
-        query["director"] = director
+        query["director"] = {"$regex": director, "$options": "i"}
     if year is not None:
         query["year"] = year
     if rating is not None:
         query["rating"] = rating
     if genre is not None:
-        query["genre"] = genre
+        query["genre"] = {"$regex": genre, "$options": "i"}
     return moviesEntity(conn.find(query))
+
+@movie.get("/genres", response_model=List[str], tags=["Movies"])
+async def get_all_genres():
+    movies = conn.find()
+    genres = set()
+    for movie in movies:
+        movie_genres = movie.get('genre', '').split(',')
+        for genre in movie_genres:
+            genres.add(genre.strip())
+    return list(genres)
 
 @movie.delete("/movies/{title}", status_code=status.HTTP_204_NO_CONTENT, tags=["Movies"])
 async def delete_movie(title: str):
