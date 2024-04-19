@@ -1,13 +1,12 @@
-from bson import ObjectId
-from fastapi import APIRouter, status,Response
-from bson import ObjectId
+from fastapi import APIRouter, Response, status
+from fastapi.responses import JSONResponse
 from typing import Optional
 from starlette.status import HTTP_204_NO_CONTENT
 
 from models.movie import Movie
 from config.db import conn
 from schemas.movie import movieEntity, moviesEntity
-from typing import List
+
 
 movie = APIRouter()
 
@@ -55,7 +54,7 @@ async def filter_movies(title: Optional[str] = None, director: Optional[str] = N
         query["genre"] = {"$regex": genre, "$options": "i"}
     return moviesEntity(conn.find(query))
 
-@movie.get("/genres", response_model=List[str], tags=["Movies"])
+@movie.get("/genres", tags=["Movies"])
 async def get_all_genres():
     movies = conn.find()
     genres = set()
@@ -63,8 +62,8 @@ async def get_all_genres():
         movie_genres = movie.get('genre', '').split(',')
         for genre in movie_genres:
             genres.add(genre.strip())
-    return list(genres)
-
+    return JSONResponse(content={"genres": list(genres)})
+        
 @movie.delete("/movies/{title}", status_code=status.HTTP_204_NO_CONTENT, tags=["Movies"])
 async def delete_movie(title: str):
     conn.find_one_and_delete({

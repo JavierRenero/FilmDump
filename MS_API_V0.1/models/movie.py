@@ -1,5 +1,3 @@
-from dataclasses import Field
-from typing import Optional
 from pydantic import BaseModel
 
 class Movie(BaseModel):
@@ -9,5 +7,3 @@ class Movie(BaseModel):
     year: int
     genre: str
     rating: float
-
-
