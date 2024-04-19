@@ -13,11 +13,11 @@ En resumen, la página web de FilmDump es una herramienta completa para explorar
 
  
 
-Este se ejecuta lledo al directorio /FilmDump, una vez estando ahí se ejecuta el comando docker compose build && docker compose up.
+Este se ejecuta yendo al directorio ```/FilmDump```, una vez estando ahí, se ejecuta el comando ```docker compose build && docker compose up```
 
-Una vez acabado se generan 3 contenedores los cuales 1 es la base de dados de MongoDB, el siguente es la API Rest y por último es la Web(progreso).
+Al finalizar se generan 3 contenedores entre los cuales está la base de dados de MongoDB, la API Rest y por último es la Web(progreso).
 
-Tanto la documentación de fastAPI como la web están alojadas en localhost, una en el puerto 8081 y la otra en el puerto 3000, respectivamente.
+Tanto la documentación de fastAPI como la web están alojadas en ```localhost```, una en el puerto ```8081/docs``` y la otra en el puerto```3000```, respectivamente.
 
   
 
