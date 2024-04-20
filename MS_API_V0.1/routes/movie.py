@@ -13,11 +13,26 @@ movie = APIRouter()
 
 @movie.get("/movies", response_model=list[Movie], tags=["Movies"])
 async def find_all_movies():
-    return moviesEntity(conn.find())
+    """
+    Retrieve all movies.
+
+    Returns:
+        A list of movies.
+    """
+    return JSONResponse(content={"movies": moviesEntity(conn.find())})
 
 
 @movie.post("/movies", response_model=Movie, tags=["Movies"])
 async def create_movie(movie: Movie):
+    """
+    Create a new movie.
+
+    Args:
+        movie: The movie data.
+
+    Returns:
+        The created movie.
+    """
     new_movie = dict(movie)
     #del new_movie["id"]
     conn.insert_one(new_movie)
@@ -27,11 +42,30 @@ async def create_movie(movie: Movie):
 
 @movie.get("/movies/{title}", response_model=Movie, tags=["Movies"])
 async def find_movie(title: str):
+    """
+    Retrieve a movie by title.
+
+    Args:
+        title: The title of the movie.
+
+    Returns:
+        The movie with the specified title.
+    """
     return movieEntity(conn.find_one({"title": title}))
 
 
 @movie.put("/movies/{title}", response_model=Movie, tags=["Movies"])
 async def update_movie(title: str, movie: Movie):
+    """
+    Update a movie by title.
+
+    Args:
+        title: The title of the movie.
+        movie: The updated movie data.
+
+    Returns:
+        The updated movie.
+    """
     conn.find_one_and_update({
         "title": title
     }, {
@@ -40,7 +74,21 @@ async def update_movie(title: str, movie: Movie):
     return movieEntity(conn.find_one({"title": title}))
 
 @movie.get('/filter', response_model=list[Movie], tags=["Movies"])
-async def filter_movies(title: Optional[str] = None, director: Optional[str] = None, year: Optional[int] = None, rating: Optional[int] = None, genre: Optional[str] = None):  
+async def filter_movies(title: Optional[str] = None, director: Optional[str] = None, year: Optional[int] = None, rating: Optional[float] = None, genre: Optional[str] = None, id: Optional[str] = None):  
+    """
+    Filter movies based on the specified criteria.
+
+    Args:
+        title: The title of the movie (optional).
+        director: The director of the movie (optional).
+        year: The year of the movie (optional).
+        rating: The rating of the movie (optional).
+        genre: The genre of the movie (optional).
+        id: The ID of the movie (optional).
+
+    Returns:
+        A list of filtered movies.
+    """
     query = {}
     if title is not None:
         query["title"] = {"$regex": title, "$options": "i"}
@@ -52,10 +100,18 @@ async def filter_movies(title: Optional[str] = None, director: Optional[str] = N
         query["rating"] = rating
     if genre is not None:
         query["genre"] = {"$regex": genre, "$options": "i"}
+    if id is not None:
+        query["_id"] = id
     return moviesEntity(conn.find(query))
 
 @movie.get("/genres", tags=["Movies"])
 async def get_all_genres():
+    """
+    Retrieve all genres.
+
+    Returns:
+        A list of genres.
+    """
     movies = conn.find()
     genres = set()
     for movie in movies:
@@ -63,9 +119,19 @@ async def get_all_genres():
         for genre in movie_genres:
             genres.add(genre.strip())
     return JSONResponse(content={"genres": list(genres)})
+
         
 @movie.delete("/movies/{title}", status_code=status.HTTP_204_NO_CONTENT, tags=["Movies"])
 async def delete_movie(title: str):
+    """
+    Delete a movie by title.
+
+    Args:
+        title: The title of the movie.
+
+    Returns:
+        HTTP 204 No Content.
+    """
     conn.find_one_and_delete({
         "title": title
     })
