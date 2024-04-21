@@ -25,7 +25,7 @@ const Movies = () => {
    */
   const fetchMovies = async () => {
     try {
-      const response = await fetch("http://localhost:8081/movies");
+      const response = (await fetch("http://localhost:8081/movies"));
       const data = await response.json();
       console.log("DATAAAAAA");
       console.log(data.content);
@@ -35,8 +35,25 @@ const Movies = () => {
     }
   };
 
+  function fetchMovie() {
+    fetch("http://localhost:8081/movies")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch movies");
+        }
+        return res.json();
+      })
+      .then((res) => {
+        console.log(res.movies[0].title);
+        setState(res);
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  }
+
   useEffect(() => {
-    fetchMovies();
+    fetchMovie();
   }, []);
 
   /**
@@ -167,27 +184,27 @@ const Movies = () => {
                 <div className="card bg-dark">
                   <img
                     src={
-                      poster_path ? `${img_300}/${poster_path}` : unavailable
-                    }
-                    className="card-img-top pt-3 pb-0 px-3"
-                    alt={title}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title text-center fs-5">{title}</h5>
-                    <div className="d-flex fs-6 align-items-center justify-content-evenly movie">
-                      <div>{genre}</div>
-                      <div>{director}</div>
-                      <div>{"Movie"}</div>
-                      <div>{year}</div>
-                      <div>{"Rating" + rating}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                      poster_path ? `${ img_300 } /${poster_path}` : unavailable
+      }
+                    className = "card-img-top pt-3 pb-0 px-3"
+                    alt = { title }
+        />
+        <div className="card-body">
+          <h5 className="card-title text-center fs-5">{title}</h5>
+          <div className="d-flex fs-6 align-items-center justify-content-evenly movie">
+            <div>{genre}</div>
+            <div>{director}</div>
+            <div>{"Movie"}</div>
+            <div>{year}</div>
+            <div>{"Rating" + rating}</div>
+          </div>
+        </div>
+                </div >
+              </div >
             );
           })}
-        </div>
-      </div>
+        </div >
+      </div >
     </>
   );
 };

@@ -6,12 +6,11 @@ import React from "react";
 import Header from "./Components/Header";
 import Footer from "./Components/Footer";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Trending from "./Pages/Trending";
+//import Trending from "./Pages/Trending";
 import Movies from "./Pages/Movies";
 import Error from "./Pages/Error";
 const App = () => {
   return (
-    <>
       <BrowserRouter>
         <Header />
         <Routes>
@@ -21,7 +20,6 @@ const App = () => {
         </Routes>
         <Footer />
       </BrowserRouter>
-    </>
   );
 };
 
