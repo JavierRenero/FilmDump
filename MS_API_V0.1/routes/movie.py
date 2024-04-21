@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import Optional
 from starlette.status import HTTP_204_NO_CONTENT
 
-from models.movie import Movie
+from models.movie import Movie, UpdateMovie
 from config.db import conn
 from schemas.movie import movieEntity, moviesEntity
 
@@ -58,7 +58,7 @@ async def find_movie(title: str):
 
 
 @movie.put("/movies/{title}", response_model=Movie, tags=["Movies"])
-async def update_movie(title: str, movie: Movie):
+async def update_movie(title: str, movie: UpdateMovie):
     """
     Update a movie by title.
 
@@ -69,10 +69,11 @@ async def update_movie(title: str, movie: Movie):
     Returns:
         The updated movie.
     """
+    newMovie = {k: v for k, v in movie.dict().items() if v is not None}
     conn.find_one_and_update({
         "title": title
     }, {
-        "$set": dict(movie)
+        "$set": newMovie
     })
     return movieEntity(conn.find_one({"title": title}))
 

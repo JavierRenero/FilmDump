@@ -1,11 +1,20 @@
 from fastapi import FastAPI
 from routes.movie import movie
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 app = FastAPI(
   title="FastAPI & MongoDB",
   description="this is a simple REST API using fastapi and mongodb by Javier",
   version="0.1",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(movie)
