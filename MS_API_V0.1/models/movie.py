@@ -19,3 +19,7 @@ class Movie(BaseModel):
    year: int
    genre: str
    rating: float
+
+   class Config:
+      orm_mode = True
+      arbitrary_types_allowed = True

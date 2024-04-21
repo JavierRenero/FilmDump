@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Response, status, HTTPException
 from fastapi.responses import JSONResponse
 from typing import Optional
 from starlette.status import HTTP_204_NO_CONTENT
@@ -33,11 +33,14 @@ async def create_movie(movie: Movie):
     Returns:
         The created movie.
     """
+    movie_exist = conn.find_one({"title": movie.title})
+    if movie_exist is not None:
+        return HTTPException(409, "Movie already exists.")
+    if "id" in movie:
+        del movie["id"]
     new_movie = dict(movie)
-    #del new_movie["id"]
     conn.insert_one(new_movie)
-    movie = conn.find_one({"title": movie.title})
-    return movieEntity(movie)
+    return movieEntity(conn.find_one({"title": movie.title}))
 
 
 @movie.get("/movies/{title}", response_model=Movie, tags=["Movies"])
