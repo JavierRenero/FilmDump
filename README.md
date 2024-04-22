@@ -22,3 +22,17 @@ Tanto la documentación de fastAPI como la web están alojadas en ```localhost``
   
 
 ¡Gracias por la oportunida y perdonad el retraso! Si tienes alguna pregunta adicional, no dudes en hacerla.
+
+![image](https://github.com/JavierRenero/FilmDump/assets/47631050/4afff9c8-9bbe-49a9-aacd-c685fce0525a)
+
+### Create.
+
+![image](https://github.com/JavierRenero/FilmDump/assets/47631050/556f5a07-d475-4818-b22a-ae73c15206a3)
+
+### Update and Delete.
+
+![image](https://github.com/JavierRenero/FilmDump/assets/47631050/dddb0fc4-d270-4eef-9a97-8603088b9180)
+
+
+
+
