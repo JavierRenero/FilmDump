@@ -21,20 +21,56 @@ body {
   z-index: 100;
   padding: 0.3% 0;
 }
-#fire {
-  font-size: 20px;
+
+#cardFrom {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 100px);
 }
+#form {
+  width: fit-content;
+  height: fit-content;
+  padding: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 34px;
+  background-color: #ffffff3d;
+
+}
+#form input {
+  border-radius: 34px;
+  padding: 0.5% 1%;
+  border: none;
+  margin: 1%;
+}
+
+
 .card {
   border-radius: 34px;
+  width: fit-content;
+  height: fit-content;
 }
 .card:hover {
   background-color: #ffffff8a !important;
   color: black !important;
 }
 .card-img-top {
-  height: 400px;
+  height: 100%;
+  width: auto;
+  max-height: 400px;
+  max-width: 300px;
   border-radius: 34px;
 }
+
+.button {
+  border-radius: 34px;
+  padding: 0.5% 1%;
+  border: none;
+}
+
 .button,
 .buttons {
   border-radius: 34px;
@@ -42,6 +78,10 @@ body {
   font-weight: 600;
   border: none !important;
 }
+#deleteButton:hover {
+  background-color: red !important;
+}
+
 .button:hover,
 .buttons {
   background-color: darkblue !important;

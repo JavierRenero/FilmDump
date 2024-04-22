@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 //import Trending from "./Pages/Trending";
 import Movies from "./Pages/Movies";
 import Error from "./Pages/Error";
+import MovieForm from "./Pages/MovieForm";
 const App = () => {
   return (
       <BrowserRouter>
@@ -16,7 +17,10 @@ const App = () => {
         <Routes>
           {/* <Route path="/" element={<Trending />} exact /> */}
           <Route path="/" element={<Movies />} />
+          <Route path="/movies/:id" element={<MovieForm />} />
+          <Route path="/movies/new" element={<MovieForm />} />
           <Route path="*" element={<Error />} />
+          
         </Routes>
         <Footer />
       </BrowserRouter>

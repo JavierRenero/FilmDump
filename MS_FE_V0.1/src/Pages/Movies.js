@@ -4,6 +4,8 @@
  */
 import React, { useState, useEffect } from "react";
 import { img_300, unavailable } from "../Components/config";
+import { fetchMovies } from "../Components/api";
+import { useNavigate } from "react-router-dom";
 
 const Movies = () => {
   const [state, setState] = useState([]); // store the fetched data
@@ -18,25 +20,32 @@ const Movies = () => {
   const [showRatingFilter, setShowRatingFilter] = useState(false);
   const [showGenreFilter, setShowGenreFilter] = useState(false);
   const [error, setError] = useState(null); // store the fetch error
+  const navigate = useNavigate();
 
   /**
    * Fetches the movies data from the server.
    * @returns {Promise<void>} A promise that resolves when the data is fetched.
    */
-  const fetchMovies = async () => {
-    try {
-      const response = (await fetch("http://localhost:8081/movies"));
-      const data = await response.json();
-      console.log("DATAAAAAA");
-      console.log(data.content);
-      setState(data);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
 
-  function fetchMovie() {
-    fetch("http://localhost:8081/movies")
+  /*  function fetchMovie() {
+     fetch("http://localhost:8081/movies")
+       .then((res) => {
+         if (!res.ok) {
+           throw new Error("Failed to fetch movies");
+         }
+         return res.json();
+       })
+       .then((res) => {
+         console.log(res);
+         setState(res);
+       })
+       .catch((error) => {
+         setError(error.message);
+       });
+   } */
+
+  useEffect(() => {
+    fetchMovies()
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to fetch movies");
@@ -44,17 +53,46 @@ const Movies = () => {
         return res.json();
       })
       .then((res) => {
-        console.log(res.movies[0].title);
+        getPosterPath(res);
+      }).catch((error) => {
+        setError(error.message);
+      });
+  }, []);
+
+
+  function getPosterPath(res) {
+    const apiKey = "82dee22856e0d0ac5f767ec6fb845efc";
+    const moviePromises = res.map((movie) => {
+      const { title } = movie;
+      const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${title}`;
+      return fetch(url)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch movie details");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          const { results } = data;
+          if (results.length > 0) {
+            const { poster_path } = results[0];
+            movie.poster_path = poster_path;
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    });
+    Promise.all(moviePromises)
+      .then(() => {
         setState(res);
       })
       .catch((error) => {
-        setError(error.message);
+        console.error(error);
       });
-  }
+  };
 
-  useEffect(() => {
-    fetchMovie();
-  }, []);
+
 
   /**
    * Filters the movies based on the filter criteria.
@@ -62,18 +100,18 @@ const Movies = () => {
    * @returns {boolean} True if the movie matches the filter criteria, false otherwise.
    */
   const filteredMovies = state.filter((movie) => {
-    const { title, director, year, rating, genre } = movie;
+    const { title, director, year, genre, rating } = movie;
     return (
       title &&
       director &&
       year &&
-      rating &&
       genre &&
+      rating &&
       title.toLowerCase().includes(titleFilter.toLowerCase()) &&
       director.toLowerCase().includes(directorFilter.toLowerCase()) &&
       year.toString().includes(yearFilter) &&
-      rating.toString().includes(ratingFilter) &&
-      genre.toLowerCase().includes(genreFilter.toLowerCase())
+      genre.toLowerCase().includes(genreFilter.toLowerCase()) &&
+      rating.toString().includes(ratingFilter)
     );
   });
 
@@ -180,27 +218,28 @@ const Movies = () => {
             } = movie;
 
             return (
-              <div className="col-md-2 col-sm-3 py-2" key={id}>
-                <div className="card bg-dark">
+              <div className="col-md-3 col-sm-4 py-3">
+                <div className="card bg-dark" onClick={()=>{
+                  navigate(`/movies/${id}`);
+                }}>
                   <img
                     src={
-                      poster_path ? `${ img_300 } /${poster_path}` : unavailable
-      }
-                    className = "card-img-top pt-3 pb-0 px-3"
-                    alt = { title }
-        />
-        <div className="card-body">
-          <h5 className="card-title text-center fs-5">{title}</h5>
-          <div className="d-flex fs-6 align-items-center justify-content-evenly movie">
-            <div>{genre}</div>
-            <div>{director}</div>
-            <div>{"Movie"}</div>
-            <div>{year}</div>
-            <div>{"Rating" + rating}</div>
-          </div>
-        </div>
-                </div >
-              </div >
+                      poster_path ? `${img_300}/${poster_path}` : unavailable
+                    }
+                    className="card-img-top pt-3 pb-0 px-3"
+                    alt={title}
+                  />
+                  <div className="card-body">
+                    <h5 className="card-title text-center fs-5">{title}</h5>
+                    <h6 className="card-subtitle fs-6 text-muted">{director}</h6>
+                    <p className="card-text"><small className="text-right text-muted">{year}</small></p>
+                    <ul className="list-gruop list-group-flush list-unstyled">
+                      <li className="text-muted" >Genre: {genre}</li>
+                      <li className="text-muted">⭐ {rating}/10</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             );
           })}
         </div >

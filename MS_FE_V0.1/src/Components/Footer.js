@@ -9,11 +9,17 @@ const Footer = () => {
    */
   const data = [
     {
-      icon: "fas fa-film",
-      name: "Movies",
+      icon: "fas fa-home",
+      name: "Home",
       link: "/",
+      id: 0,
+    },{
+      icon: "fas fa-film",
+      name: "Create Movie",
+      link: "/movies/new",
       id: 1,
     }
+    
   ];
   
   return (
@@ -29,10 +35,11 @@ const Footer = () => {
                       className="col-sm-2 col-md-2 btn btn-dark"
                       key={Val.id}
                     >
-                      <i className={`${Val.icon}`} id="fire"></i>
+                      <i className={`${Val.icon}`} id="film"></i>
                       <br />
                       <h5 className="pt-1 fs-6">{Val.name}</h5>
                     </button>
+                    
                   </NavLink>
                 </>
               );

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Response, status, HTTPException
 from fastapi.responses import JSONResponse
 from typing import Optional
 from starlette.status import HTTP_204_NO_CONTENT
-
+from bson import ObjectId
 from models.movie import Movie, UpdateMovie
 from config.db import conn
 from schemas.movie import movieEntity, moviesEntity
@@ -19,7 +19,7 @@ async def find_all_movies():
     Returns:
         A list of movies.
     """
-    return JSONResponse(content={"movies": moviesEntity(conn.find())})
+    return  moviesEntity(conn.find())
 
 
 @movie.post("/movies", response_model=Movie, tags=["Movies"])
@@ -54,7 +54,7 @@ async def find_movie(title: str):
     Returns:
         The movie with the specified title.
     """
-    return movieEntity(conn.find_one({"title": title}))
+    return movieEntity(conn.find_one({"_id": ObjectId(title)}))
 
 
 @movie.put("/movies/{title}", response_model=Movie, tags=["Movies"])
@@ -71,11 +71,11 @@ async def update_movie(title: str, movie: UpdateMovie):
     """
     newMovie = {k: v for k, v in movie.dict().items() if v is not None}
     conn.find_one_and_update({
-        "title": title
+        "_id": ObjectId(title)
     }, {
         "$set": newMovie
     })
-    return movieEntity(conn.find_one({"title": title}))
+    return movieEntity(conn.find_one({"_id": ObjectId(title)}))
 
 @movie.get('/filter', response_model=list[Movie], tags=["Movies"])
 async def filter_movies(title: Optional[str] = None, director: Optional[str] = None, year: Optional[int] = None, rating: Optional[float] = None, genre: Optional[str] = None, id: Optional[str] = None):  
@@ -137,6 +137,6 @@ async def delete_movie(title: str):
         HTTP 204 No Content.
     """
     conn.find_one_and_delete({
-        "title": title
+        "_id": ObjectId(title)
     })
     return Response(status_code = HTTP_204_NO_CONTENT)
